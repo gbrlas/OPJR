@@ -1,0 +1,66 @@
+
+---
+title: "1 Uvod"
+author: "Goran Brlas"
+date: "6. listopad 2017"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(results = 'hold')
+```
+
+***
+
+Ovo je prva radna bilje??nica koja prati ud??benik "Programirajmo u R-u". Radna bilje??nica uobli??ena je u RMD (R Markdown) datoteku i predvi??ena je za otvaranje u alatu RStudio.
+
+Ukoliko ste ovaj dokument otvorili u alatu RStudio na alatnoj traci iznad ovog teksta mo??ete uo??iti gumb "Knit". Poku??ajte ga stisnuti - trebali biste kao rezultat dobiti HTML ina??icu radne bilje??nice koju mo??ete ??itati uz pomo?? obi??nog web preglednika.
+
+Radna bilje??nica prati primjere i zadatke koji se obra??uju u odre??enoj lekciji. Primjer kojeg vidite u ud??beniku mo??ete vidjeti u nastavku:
+
+### Primjer 1 - nekoliko jednostavnih naredbi R programskog jezika
+
+```{r}
+3+2         #zbrajanje
+log(10)    # prirodni logaritam!
+log10(10)   # ovo je logaritam baze 10! Usput, komentare pi??emo znakom "#"
+sin(0.5 * pi)      # pi je jedna od ugra??enih konstanti
+```
+
+Probajte izvesti svaku naredbu zasebno (uz pomo?? kombinacije tipaka CTRL+ENTER) ili sve odjednom (CTRL+SHIFT+ENTER). Rezultate ??ete mo??i vidjeti ispod R bloka (ukoliko ih ne vidite, provjerite da li imate uklju??enu opciju *Chunk Output inline*  Uo??ite da ??e sve naredbe unutar ovakvih "R blokova" RStudio automatski izvesti kod pretvorbe ove bilje??nice u HTML dokument.
+
+Slijede i primjeri zadataka iz ud??benika. Unesite tra??ene izmjene i izvr??ite nastupaju??e blokove.
+
+### Zadatak 1.1 - naredbe za provjeru i izmjenu radne mape
+
+```{r}
+# izvr??ite sljede??e naredbe uklanjanjem znaka komentara
+
+getwd()     # mapa u kojoj trenutno radimo
+setwd(".")  # ovdje mo??emo navesti novu radnu mapu ukoliko ??elimo
+
+```
+
+Primjer uvo??enja novog koncepta i rje??avanja zadatka:
+
+Dok bi u drugim programskim jezicima kao operator pridru??ivanja koristili `=`, u R-u se preferira operator `<-`. Poku??ajte u varijablu imena `x` upisati broj 5 u sljede??em zadatku, te ispisati tu varijablu (uz pomo?? funkcije `print` ili samo navo??enjem imena varijabli). Pripazite da u programskom kodu ne koristite lijeve jednostruke navodnike koje vidite u ovom paragrafu teksta - oni slu??e samo zbog toga da bi se kod generiranja HTML ina??ice ovog dokumenta dijelovi teksta unutar istih formatirali kao programski kod. Ovu konvenciju ??esto ??emo koristiti i u komentarima unutar zadataka koji daju dodatne upute. Ukratko - u programskom kodu imena varijabli i konstanti NE KORISTE jednostruke navodnike. 
+
+
+### Zadatak 1.2 - R-ovski operator pridru??ivanja
+
+```{r}
+x <- 5
+x
+
+```
+
+Ovo je zavr??etak radne bilje??nice, no slobodno ju mo??ete koristiti za eksperimentiranje u radu sa RMD datotekama i RStudiom. Neke stvari koje mo??ete poku??ati su:
+
+- stvaranje novog bloka sa kombinacijom tipaka CTRL+ALT+I ili odabirom opcija *Insert -> R*
+- isprobavanje razli??itih opcija u izborniku postavki (mali kota??i?? pored gumba Knit)
+- stvaranje PDF ili DOC dokumenta unutar Knit izbornika (mogu??e je da ovo ne??e pro??i ako nemate otprije instalirani prate??i softver, kao npr. MikTEX za PDF ili Microsoft Office za DOC)
+- izvr??avanje Python bloka unutar RMD dokumenta (*Insert -> python* potrebno imati instaliran Python jezik na platformi)
+- itd.
