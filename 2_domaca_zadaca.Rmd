@@ -1,0 +1,63 @@
+---
+title: "2_domaca_zadaca"
+author: "Goran Brlas"
+date: "10/16/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Što je rezultat sljedećih naredbi? Razmislite o mogućem rezultatu prije izvršavanja.
+
+```{r}
+as.complex(2)
+as.integer(-3.25)
+as.logical("0")
+as.numeric(TRUE)
+as.character(11.5+2i)
+as.numeric("ABC")
+```
+
+## 2. Kako u R-u izgledaju sljedeći opisni izrazi:
+
+```{r}
+# tri puta deset na devetu
+3 * 10 ** 9
+# logaritam od 5
+log(5)
+# cjelobrojno dijeljenje 10 sa 3
+10 %/% 3
+# ostatak cjelobrojnog dijeljenja 10 sa 3
+10 %% 3
+# tangens od 75 stupnjeva
+deg2rad <- function(deg) {(deg * pi) / (180)}
+tan(deg2rad(75))
+```
+
+## 3. Uz pomoć if izraza provjerite da li se rezultat dijeljenja cijelog broja s nulom smatra kao vrijednost NA, NaN ili NULL.
+
+```{r}
+if (is.na(5L / 0)) {
+  print("To je NA.")
+} else if (is.nan(5L / 0)) {
+  print("To je NaN.")
+} else if (is.null(5L / 0)) {
+  print("To je NULL.")
+} else {
+  print(class(5L / 0))
+}
+```
+
+## 4. Ubacite u varijablu x vrijednost 5. Ispišite sve varijable okoline. Potom u varijablu x ubacite NULL. Postoji li i dalje ova varijabla?
+
+```{r}
+x <- 5
+ls()
+x <- NULL
+ls()
+```
+
+
+
