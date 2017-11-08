@@ -26,6 +26,7 @@ Kod podizanja R okoline automatski se učitavaju određeni paketi u radnu memori
 
 ```{r}
 # pozovite funkciju `search` (bez parametara) i pogledajte koji paketi su učitani u okolinu
+search()
 ```
 
 
@@ -41,6 +42,7 @@ Ukoliko želimo učitati novi paket u našu okolinu, to možemo izvesti uz pomo�
 
 ```{r}
 # učitajte paket `dplyr` u R okolinu 
+library(dplyr)
 ```
 
 
@@ -60,10 +62,12 @@ Ukoliko na lokalnom računalu nemamo navedeni paket dobivamo poruku o grešci da
 ```{r}
 # instalirajte paket `dplyr` sa CRAN repozitorija
 # (ovo možete učiniti čak i ako već imate navedeni paket)
+# install.packages("dplyr")
 
 # učitajte ponovo paket u radnu okolinu
-
+library(dplyr)
 # ispišite stazu pretrage
+search()
 ```
 
 ***
@@ -111,13 +115,14 @@ U R-u se rijetko govori o "ugrađenim" funkcijama budući da - kao što je već 
 # stvorite vektor x koji će imati 10 slučajnih elemenata
 # izvučenih iz standardne normalne distribucije
 # koristite puni naziv funkcije `rnorm` iz paketa `stats`
-
+x <- rnorm(n = 10)
 
 # zaokružite elemente vektora x na dvije decimale
 # koristite puni naziv funkcije `round` iz paketa `base`
+x <- base::round(x, digits = 2)
 
 # ispišite vektor x
-
+x
 ```
 
 ***
@@ -134,9 +139,9 @@ Iako je ovo sintaksno korektan način pozivanja funkcije, R nam omogućuje da iz
 # stvorite vektor y po istom principu kao i vektor x
 # obavite sve u jednom retku
 # koristite nazive funkcija bez naziva paketa
-
+y <- round(rnorm(n = 10), digits = 2)
 # ispišite y
-
+y
 ```
 
 ***
@@ -159,18 +164,19 @@ Kada želimo pristupiti nekoj varijabli, R mora pretražiti svoj interni "zapisn
 
 ```{r}
 # stvorite varijablu e i u nju pohranite referencu na globalnu okolinu
-
+e <- globalenv()
 # ispišite varijablu e
-
+e
 # stvorite varijablu x i u nju ubacite broj 5
-
+x <- 5
 # izvršite funkciju `ls` bez parametara
-
+ls()
 # izvršite funkciju `ls` sa varijablom `e` kao parametrom
-
+ls(e)
 # ispišite x
-
+x
 # ispišite e$x    (uočite sintaksu liste!)
+e$x
 ```
 
 
@@ -203,6 +209,7 @@ Pogledajmo tko je okolina-roditelj globalnoj okolini uz pomoć funkcije `parent.
 
 ```{r}
 # ispišite okolinu-roditelja globalne okoline i objasnite rezultat
+parent.env(e)
 ```
 
 
@@ -254,18 +261,21 @@ mjesto <- data.frame( pbr = c(10000, 51000, 21000, 31000, 2000),
 
 # pozovite funkciju `attach` i proslijedite podatkovni okvir `mjesto` kao parametar
 # ovo napravite samo jednom kako ne bi okvir ubacili više puta u stazu pretrage
+attach(mjesto)
 
 # ispišite stazu pretrage i komentirajte rezultat
-
+search()
 # ispišite varijablu pbr (bez reference na `mjesto`!)
-
+pbr
 # promjenite treći element varijable prirez na 12
-
+prirez[3] = 12
 # ispišite tablicu `mjesto`
-
+mjesto
 # ispišite varijable globalne okoline
-
+search()
 # uz pomoć funkcije `detach` uklonite tablicu `mjesto` iz staze pretrage
+detach(mjesto)
+search()
 ```
 
 

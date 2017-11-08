@@ -1,0 +1,48 @@
+---
+title: "dz6"
+author: "Goran Brlas"
+date: "11/8/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Učitajte sljedeće pakete u radnu okolinu: magrittr, dplyr, tidyr, ggplot2. Ispišite stazu pretrage i provjerite gdje se nalaze učitani paketi.
+
+```{r}
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+2. Sljedeća naredba stvoriti će vektor od 20 nasumično odabranih prirodnih brojeva od 1 do 100. Uz pomoć podsjetnika i/ili službene dokumentacije pronađite ugrađene funkcije koje izvršavaju zadane zadatke.
+
+```{r}
+# učitavamo 20 prirodnih brojeva od 1 do 100, sa ponavljanjem
+
+set.seed(1234)
+a <- sample(1:100, 20, replace = T)
+```
+
+ispišite:
+  - vektor a
+  - vrijednosti vektora a poredane obrnutim redoslijedom
+  - jedinstvene vrijednosti iz vektora a
+  - vrijednosti vektora a poredane uzlazno
+  
+```{r}
+a
+rev(a)
+unique(a)
+sort(a)
+```
+
+3. Spomenuli smo da su učitani paketi zapravo “okoline”. Ukoliko želimo dobiti direktnu referencu na njih, moramo se poslužiti funkcijom as.environment i imenom paketa. Pokušajte dobiti referencu na paket package:magrittr u obliku okoline te uz pomoć funkcije ls provjerite koje nazive ona sadrži u sebi.
+
+```{r}
+ls(as.environment("package:magrittr"))
+```
+
