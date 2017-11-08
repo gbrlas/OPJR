@@ -46,14 +46,20 @@ Konačno, ukoliko želimo povećati robusnost funkcije na način da ćemo odbiti
 # ukoliko jedan ili oba vektora nisu numerički ili nisu iste duljine, 
 # funkcija mora izbaciti grešku
 # u funkciji nemojte koristiti petlje
+veci <- function(a, b) {
+  stopifnot(is.numeric(a) && is.numeric(b) && length(a) == length(b))
+  
+  return(ifelse(a >= b, a, b))
+}
 
 # pozovite funkciju `veci` nad kombinacijama vektora
 # c(T, F, T) i c(1, 2, 3)
 # c(1, 2, 3, 4) i c(5, 6, 7)
 # c(1, 2, 3) i c(0, 4, 2)
 
-# (preporuka - drugi dio zadatka isprobati direktno u konzoli!)
-
+#veci(c(T, F, T), c(1, 2, 3))
+#veci(c(1, 2, 3, 4), c(5, 6, 7))
+veci(c(1, 2, 3), c(0, 4, 2))
 ```
 
 ***
@@ -89,8 +95,7 @@ ispisiParametre <- function(...) {
 }
 
 # pozovite gornju funkciju sa proizvoljnim parametrima
-
-
+ispisiParametre(seq(0, 10, 2))
 ```
 
 ***
@@ -125,8 +130,9 @@ Pokušajmo uz pomoć prikazanog konstruktora stvoriti novi objekt klase `Osoba`.
 ```{r}
 # stvorite varijablu `ivo` koja će biti klase `Osoba` a koja će imati sljedeće vrijednosti atributa:
 # OIB: 1357135713, prezime: Ivić, tezina: 76
-
+ivo <- Osoba(oib = "1357135713", prezime = "Ivic", tezina = 76)
 # ispišite varijablu `ivo`
+ivo
 ```
 
 ***
@@ -164,9 +170,15 @@ print(x)
 ```{r}
 # implementirajte funkciju f tako da dohvati referencu na globalnu okolinu 
 # i poveća "vanjski" x za 1
+f <- function() {
+  e <- globalenv()
+  e$x <- e$x + 1
+}
 
 x <- 5
 # pozovite f(x) i ispisite x
+f()
+x
 ```
 
 ***
@@ -261,11 +273,14 @@ Pokušajte samostalno napraviti generator funkcija koji vraća funkcije za množ
 ```{r}
 # stvorite funkciju `tvornicaMnozenja` koja stvara funkcije množenja primljenog broja 
 # sa nekom predefiniranom konstantom
+tvornicaMnozenja <- function(num) {
+  function(x) x * num
+}
 
 # uz pomoć gornje funkcije napravite funkciju `puta2` koja udvostručuje primljeni broj
-
+puta2 <- tvornicaMnozenja(2)
 # pozovite funkciju `puta2` s parametrom 3 i ispišite rezultat
-
+puta2(3)
 ```
 
 ***
@@ -351,14 +366,22 @@ ispisi <- function(x) UseMethod("ispisi")
 # OIB: <oib>, Prezime: <prezime>, tezina: <tezina>
 # za slaganje ispisa koristite funkciju `paste`
 # a za sam ispis funkciju `cat`
+ispisi.Osoba <- function(x) {
+  cat(paste("OIB:", x$oib, "Prezime:", x$prezime, "tezina:", x$tezina, "\n"))
+}
+
+ispisi.Osoba(pero)
 
 # implementirajte funkciju naziva ispisi.default koja prima jedan parametar
 # i ispisuje ga na zaslon uz pomoć funkcije `cat`
+ispisi.default <- function(x) {
+  cat(x)
+}
 
 # ispišite varijablu `pero` uz pomoć generičke funkcije `ispisi`
-
+ispisi(pero)
 # ispišite vektor c(1, 2, 3, 4, 5) uz pomoć generičke funkcije `ispisi`
-
+ispisi(c(1:5))
 ```
 
 ***
@@ -372,11 +395,14 @@ Naravno, nismo morali nužno stvoriti vlastitu funkciju ispisi - vjerojatno bi b
 ```{r}
 # provjerite da li je print generička funkcija 
 # (jednostavno ispišite njezin izvorni kod navođenjem samog imena funkcije)
+print
 
 # omogućite ispis klase `Osoba` uz pomoć generičke funkcije `print`
 # (možete se poslužiti funkcijom iz prethodnog zadatka)
+print.Osoba <- ispisi.Osoba
 
 # ispišite varijablu `Pero` uz pomoć generičke funkcije `print`
+print(pero)
 ```
 
 ***
@@ -392,8 +418,9 @@ Za kraj, prikažimo mogućnost R-a da nam izlista sve trenutno poznate implement
 
 ```{r}
 # prikažite sve do sad poznate implementacije generičke funkcije `summary`
-
+methods(summary)
 # provjerite koje sve implementacije generičkih funkcija postoje za klasu `factor`
+methods(class = factor)
 ```
 
 
