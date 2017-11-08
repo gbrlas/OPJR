@@ -231,6 +231,7 @@ Kao što je već rečeno, S3 objekti zapravo su preneseni iz programskog jezika 
 # stvaramo novi objekt klase `osoba`
 pero <- list(oib = "12345678", prezime = "Peric", tezina = 78)
 class(pero) <- "Osoba"
+class(pero)
 
 ```
 
@@ -244,6 +245,7 @@ R omogućuje nasljeđivanje, ali također na vrlo neformalan i relativno trivija
 ```{r, eval = F}
 mate <- list(oib = "12345678", prezime = "Peric", tezina = 78, godZaposlenja = 2001)
 class(mate) <- c("Zaposlenik", "Osoba")
+class(mate)
 ```
 
 ***
@@ -289,9 +291,12 @@ Kako pojedina funkcija "zna" što učinit sa objektom? Odgovor je jednostavan - 
 
 ```{r}
 # ispišite funkciju `summary` (samo naziv funkcije!)
+summary
 
+print("----------------------------")
 # ispišite funkciju koja se zapravo poziva kad pozovete
 # funkciju `summary` nad objektom klase `factor`
+summary.factor
 ```
 
 
