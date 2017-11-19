@@ -1,0 +1,62 @@
+---
+title: "dz8"
+author: "Goran Brlas"
+date: "11/19/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Uzmimo matricu m stvorenu sljedećom naredbom:
+
+```{r}
+m <- rbind(1:5, seq(2, 10, 2), rep(3, 5), 3:7, seq(100, 500, 100))
+m
+```
+
+Uz pomoć funkcije apply i nove anonimne funkcije stvorite vektor koji će sadržavati prvi parni element svakog retka, ili nulu ako pripadajući redak nema parnih elemenata.
+
+```{r}
+apply(m, 1, function(x) {
+  rez <- 0
+  
+  for (element in x) {
+    if (element %% 2 == 0) {
+      rez <- element
+      break
+    }
+  }
+  
+  rez
+})
+```
+
+2. Sljedeće naredbe stvoriti će listu od 100 elemenata gdje će svaki element biti numerički vektor nasumične duljine od 1 do 10.
+
+```{r}
+set.seed(1234)
+lista <- replicate(100, sample(1:10, sample(1:10, 1)))
+```
+
+Uz pomoć funkcija lapply / sapply (i dodatnih naredbi ako je potrebno) stvorite:
+
+- numerički vektor v sa duljinama elemenata liste
+- listu l sa normaliziranim numeričkim vektorima originalne liste
+- numerički vektor ind4 sa indeksima svih elemenata liste koji sadrže broj 4
+- podatkovni okvir df5 koji kao stupce sadrži sve elemente liste duljine 5
+
+```{r}
+v <- unlist(lapply(lista, length))
+l <- lapply(lista, function(x) if (is.numeric(x)) { round(scale(x), 3) } else x)
+ind4 <- which(unlist(lapply(lista, function(x) if (4 %in% x) { TRUE } else FALSE )))
+df5 <- as.data.frame(lista[unlist(lapply(lista, function(x) length(x)==5))])
+names(df5) <- which(unlist(lapply(lista, function(x) length(x)==5) == T))
+
+v
+l
+ind4
+df5
+```
+
