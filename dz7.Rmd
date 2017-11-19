@@ -1,0 +1,107 @@
+---
+title: "dz7"
+author: "Goran Brlas"
+date: "11/19/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1. R ima funkciju which koja pretvara logički vektor u numerički sa rednim brojevima elemenata koji su TRUE (tako c(T, F, F, F, F, T, F, T) postaje c(1, 6, 8)). Implementirajte vlastitu inačicu ove funkcije.
+
+```{r}
+pretvori <- function(x) {
+  arr <- c()
+  for (i in 1:length(x)) {
+    if (isTRUE(x[i])) {
+      arr <- c(arr, i)
+    }
+  }
+  
+  arr
+}
+
+pretvori(c(T, F, F, F, F, T, F, T))
+```
+
+2. Uzmimo numerički vektor x duljine n. U statistici standardiziranim momentom k-tog reda zovemo vrijednost:
+
+Stvorite generator funkcija moment(k) koji će stvarati funkcije za računanje standardiziranog centralnog momenta k-tog reda. Stvorite funkcije nulti_moment(x) i prvi_moment(x) sa vrijednosti parametra k redom 0 i 1. Testirajte funkcije na vektoru 1:1000. Usporedite rezultate koje daje funkcija sd (standardna devijacija) nad vektorom 1:1000 i korijen rezultata funkcije prvi_moment nad istim vektorom.
+
+```{r}
+generatorMomenata <- function(k) {
+  function(x) {
+    n = length(x)
+    x_mean = mean(x)
+    
+    1 / n * sum((x - x_mean) ** (k + 1))
+  }
+}
+
+nulti_moment <- generatorMomenata(0)
+prvi_moment <- generatorMomenata(1)
+
+nulti_moment(1:1000)
+prvi_moment(1:1000) ** (1 / 2)
+sd(1:1000)
+
+```
+
+
+Implementirajte konstruktor klase Zaposlenik koja nasljeđuje objekt klase Osoba sa sljedećom konstruktorskom funkcijom i funkcijom ispisa:
+
+```{r}
+Osoba <- function(oib, prezime, tezina) {
+    o <- list(oib = oib, prezime = prezime, tezina = tezina)
+    class(o) <- "Osoba"
+    o
+}
+
+print.Osoba <- function(o) {
+    rez <- paste("OIB:", o$oib, ", Prezime:", o$prezime, ", tezina:", o$tezina, "\n")
+    cat(rez)
+}
+```
+
+Zaposlenik uz atribute klase Osoba ima i atribut nadredjeni koji predstavlja referencu na nadređenog zaposlenika (ukoliko postoji, inače je NA).
+
+Stvorite dva objekta klase Zaposlenik (jedan nadređen drugom) i ispišite ih uz pomoć funkcije print. Potom implementirajte vlastitu inačicu generičke funkcije print za klasu Zaposlenik koja ispisuje podatke o zaposleniku i podatke o nadređenom zaposleniku (ako postoji, inače ispisuje poruku da nema nadređenog zaposlenika). Ponovo ispišite oba zaposlenika uz pomoć funkcije print.
+
+```{r, warning = FALSE}
+
+Zaposlenik <- function(oib, prezime, tezina, nadredjeni) {
+
+    stopifnot(is.character(oib))
+    stopifnot(is.character(prezime))
+    stopifnot(is.numeric(tezina) && tezina > 0)
+
+    o <- list(oib = oib, prezime = prezime, tezina = tezina, nadredjeni=nadredjeni)
+    class(o) <- c("Zaposlenik", "Osoba")
+
+    o
+}
+
+ivic <- Zaposlenik(oib = "1357135713", prezime = "Ivic", tezina = 76, NA)
+peric <- Zaposlenik(oib = "2457135713", prezime = "Peric", tezina = 76, ivic)
+
+print(ivic)
+print(peric)
+
+print.Zaposlenik <- function(x) {
+  if(is.na(x$nadredjeni)){
+      rez <- paste("OIB:", x$oib, ", Prezime:", x$prezime, ", Tezina:", x$tezina,", Nema nadredenog", "\n")
+  }else{
+      rez <- paste("OIB:", x$oib, ", Prezime:", x$prezime, ", Tezina:", x$tezina,", Nadredjeni:", x$nadredjeni$prezime, "\n")
+  }
+  cat(rez)
+}
+
+
+print(ivic)
+print(peric)
+
+```
+
