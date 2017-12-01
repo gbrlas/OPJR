@@ -62,9 +62,19 @@ Učitane podatke možete vidjeti u prozoru s gornje desne strane sučelja **RStu
 
 1. Ispišite prvih 10 elemenata vektora `a`.
 
+```{r}
+print(a[1:10])
+```
+
+
 ******************
 
 2. Ispišite klase stupaca podatkovnog okvira `b`.
+
+```{r}
+apply(b, 2, class)
+```
+
 
 ********************
 
@@ -73,6 +83,7 @@ Učitane podatke možete vidjeti u prozoru s gornje desne strane sučelja **RStu
 ```{r}
 set.seed(1234)
 v <- sample(1:100, 1000, replace = T)
+print(sum(v %% 7 == 0))
 ```
 
 Odgovorite: koliko ima elemenata vektora `v` djeljivih sa 7?
