@@ -1,0 +1,64 @@
+---
+title: "dz9"
+author: "Goran Brlas"
+date: "12/9/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
+library(tidyr)
+```
+
+Inicijalizirajte generator slučajnih brojeva uz pomoć naredbe set.seed(1234). Potom uz pomoć jedne naredbe i %>% operatora izvedite sljedeće:
+
+- stvorite 100000 nasumičnih brojeva izvučenih iz normalne razdiobe za aritmetičkom sredinom 10000 i standardnom devijacijom 1000
+
+- zaokružite brojeve na prvi veći cijeli broj
+
+- izbacite duplikate iz skupa
+
+- poredajte skup po veličini
+
+- slučajnim odabirom iz skupa izvucite 100 elemenata
+
+- organizirajte tih 100 elemenata u matricu 10 x 10, složenu po retcima
+
+- izračunajte sume redaka matrice
+
+- ispišite prosjek suma redaka na zaslon.
+
+```{r}
+set.seed(1234)
+rnorm(n=100000,sd=1000,mean=10000) %>% ceiling() %>% unique() %>% sort() %>% sample(100) %>% matrix(ncol=10,nrow=10, byrow=T) %>% rowSums() %>% mean()
+```
+
+U datoteci weather.csv nalaze se podaci o izmjerenim vremenskim uvjetima od strane meteorološke stanice koja svaki sat vremena mjeri temperaturu, tlak, vlažnost i brzinu vjetra (podaci su preuzeti i prilagođeni iz podatkovnog skupa paketa weatherData dostupnog na CRAN-u). Izvedite sljedeće:
+
+- učitajte datoteku u podatkovni okvir i proučite učitane podatke (names, str, summary, head…)
+```{r}
+weather <- read.csv('weather.csv', stringsAsFactors = T, na.strings = 'NULL')
+str(weather)
+head(weather)
+```
+
+- odgovorite: da li se radi o urednim podacima? Zašto?
+Ne radi se o urednim podacima zato što vrijednosti stupca "Measure" bi trebali biti zasebni stupci.
+
+- poduzmite odgovarajuće korake kako bi dobili podatkovni okvir koji odgovara principu urednih podataka
+```{r}
+weather <- weather[order(weather$time_hour),]
+weather %>% spread("Measure", "Value", fill = NA) -> weather2
+
+str(weather2)
+head(weather2)
+```
+
+
+- spremite “uređeni” u okvir u datoteku weatherClean.csv
+
+```{r}
+write.csv(weather2, file = 'weatherClean.csv', row.names = F)
+```
+
