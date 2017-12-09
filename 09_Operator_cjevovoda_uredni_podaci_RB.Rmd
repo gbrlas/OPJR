@@ -132,12 +132,13 @@ U radnoj mapi trebala bi se nalaziti datoteka `studenti.csv`. Učitajmo ju u rad
 ```{r}
 # učitajte podatke iz datoteke `studenti.csv` u varijablu `studenti`
 # ne zaboravite na parametar `stringsAsFactors`!
-##!## studenti <- read.csv("studenti.csv", fileEncoding="UTF-8", stringsAsFactors = F)
+studenti <- read.csv('studenti.csv', stringsAsFactors = F)
 
 # upoznajte se sa podacima uz pomoć standardnih funkcija za tu svrhu
 # (names, sapply - class, str, head, summary ...)
 # u daljnim primjerima za ovaj postupak koristiti ćemo se izrazom "proučite okvir.."
-
+str(studenti)
+head(studenti)
 ```
 
 
@@ -150,10 +151,11 @@ U radnoj mapi trebala bi se nalaziti datoteka `studenti.csv`. Učitajmo ju u rad
 ```{r}
 # ponovo učitajte podatke iz datoteke `studenti.csv` u varijablu `studenti`
 # naredbi `read.csv` dodajte parametar `na.strings` sa znakovnim nizom koji predstavlja NA
-
+studenti <- read.csv('studenti.csv', stringsAsFactors = F, na.strings = "NULL")
 
 # proučite okvir `studenti`
-
+str(studenti)
+head(studenti)
 ```
 
 ***
@@ -190,10 +192,12 @@ Obavimo ovu funkciju nad našim podatkovnim okvirom.
 
 ```{r}
 # stvorite podatkovni okvir `ocjene` uz pomoć funkcije `gather` i okvira `studenti`
-
+ocjene <- gather(studenti, Predmet, Ocjena, Matematika.1:Algoritmi.1, na.rm = T, factor_key = T )
 
 # proučite okvir `ocjene`
-
+str(ocjene)
+head(ocjene)
+tail(ocjene)
 ```
 
 
@@ -224,9 +228,10 @@ Pokušajmo uz pomoć ove naredbe "rekonstruirati" originalni podatkovni okvir `s
 ```{r}
 # "raširite" podatkovni okvir `ocjene` uz pomoć naredbe `spread`
 # rezultat pohranite u okvir `studenti2`
+studenti2 <- spread(ocjene, Predmet, Ocjena)
 
 # proučite okvire `studenti` i `studenti2`
-
+studenti2
 ```
 
 ***
@@ -241,8 +246,12 @@ Učitajmo podatke iz datoteke `auti.csv` koja pohranjuje tehničke karakteristik
 
 ```{r}
 # učitajte datoteku `auti.csv` u podatkovni okvir naziva `auti`
+auti <- read.csv("auti.csv", stringsAsFactors = F)
+
 
 # proučite okvir `auti`
+str(auti)
+head(auti)
 
 ```
 
@@ -260,8 +269,11 @@ Pokušajte urediti ovaj okvir uz pomoć naredbe `spread`.
 
 ```{r}
 # stvorite okvir `auti2` koji će biti uređena inačica okvira `auti`
+auti2 <- spread(auti, Tehnicka.karakteristika, Vrijednost)
 
 # proučite okvir `auti2`
+str(auti2)
+head(auti2)
 
 ```
 
@@ -279,8 +291,11 @@ Potrošačka košarica predstavlja zapis atrikala koje je kupac kupio tijekom je
 
 ```{r}
 # učitajte podatke iz datoteke `potrosackaKosarica.csv` u podatkovni okvir imena `racuni`
+racuni <- read.csv("potrosackaKosarica.csv", stringsAsFactors = F)
 
 # proučite okvir `racuni`
+str(racuni)
+head(racuni)
 ```
 
 
@@ -293,6 +308,11 @@ Potrošačka košarica predstavlja zapis atrikala koje je kupac kupio tijekom je
 # pretvorite podatke okvira `racuni` iz "širokog" formata u "dugi"
 
 # novi okvir nazovite `racuniDugi`
+racuniDugi <- gather(racuni, artikl, vrijednost, -racunID)
+racuniDugi <- racuniDugi [racuniDugi$vrijednost != 0, 1:2]
+racuniDugi <- racuniDugi[order(racuniDugi$racunID), ]
+head(racuniDugi)
+write.csv(racuniDugi, file = 'potrosackaKosaricaDugiFormat.csv', row.names = F)
 ```
 
 
@@ -304,7 +324,11 @@ Potrošačka košarica predstavlja zapis atrikala koje je kupac kupio tijekom je
 ```{r}
 # pokušajte "dugi" format oblikovati natrag u "široki"
 # pohranite rezultat u datoteku `potrosackaKosaricaSirokiFormat.csv`
-
+racuniSiroki <- racuniDugi
+racuniSiroki$Vrijednost <- 1
+racuniSiroki <- spread(racuniSiroki, artikl, Vrijednost, fill = 0)
+head(racuniSiroki)
+write.csv(racuniSiroki, file = 'potrosackaKosaricaSirokiFormat.csv', row.names = F)
 ```
 
 
@@ -322,9 +346,11 @@ Funkcija `separate` je korisna kada neki stupac ima "složene" vrijednosti koje 
 
 ```{r}
 # čitajte podatke iz datoteke `odjeli.csv` u varijablu `odjeli`
+odjeli <- read.csv("odjeli.csv", stringsAsFactors = F)
 
 # proučite okvir `odjeli`
-
+str(odjeli)
+head(odjeli)
 ```
 
 
@@ -357,10 +383,11 @@ Pokušajmo primjeniti ovu funkciju na tablicu `odjeli`. Ponovimo usput princip k
 # razdvojite stupac `Kvartal` u stupce `Kvartal` i `Godina` uz uklanjanje originalnog stupca
 # rezultat pohranite u varijablu `odjeli2`
 # sve učinite u sklopu jedne naredbe uz pomoć `%>%` operatora
-
+odjeli %>% separate(Kvartal, c("Kvartal", "Godina"), "-") -> odjeli2
 
 # proučite okvir `odjeli2`
-
+str(odjeli2)
+head(odjeli2)
 ```
 
 ***
@@ -395,10 +422,11 @@ Isprobajmo naredbu na okviru `odjeli2`.
 # koristite `-` kao separator
 # spremite rezultat u varijablu `odjeli3`
 # sve ovo izvedite u sklopu jedne naredbe uz pomoć `%>%` operatora
-
+odjeli2 %>% unite(Kvartal, Kvartal, Godina, sep = "-") -> odjeli3
 
 # proučite okvire `odjeli` i `odjeli3`
-
+head(odjeli)
+head(odjeli3)
 ```
 
 
