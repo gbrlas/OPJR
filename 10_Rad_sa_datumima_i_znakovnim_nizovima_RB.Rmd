@@ -8,6 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(stringr)
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(results = 'hold')
 ```
@@ -445,13 +446,16 @@ niz2 <- "spajanja nizova!       "
 # iz rezultata uklonite praznine s početka i kraja niza,
 # zatim izdvojite podniz od 8. do 23. znaka te konačni rezultat ispišite na zaslon
 
+str_c(niz1, niz2) %>% str_trim() %>% str_sub(8, 23)
+
 niz <- "R je pretjerano kompliciran i nimalo lagan jezik!"
 
 # u gornjem nizu znakova zamjenite sve od 9. znaka (brojeno od početka)
 # do 13. (brojeno od kraja) sa praznim nizom 
+str_sub(niz, 9, -13) <- ""
 
 # ispišite niz
-
+niz
 ```
 
 ***
@@ -472,11 +476,12 @@ niz2 <- "ovih nizova"
 niz3 <- "potreban je razmak!"
 
 # spojite gornje nizove u jedinstveni niz i ispišite rezultat
+str_c(niz1, niz2, niz3, sep = " ")
 
 nizovi <- c("A", "ovi", "nizovi", "su", "elementi", "vektora...")
 
 # spojite elemente gornjeg vektora u jedan niz i ispišite rezultat
-
+str_c(nizovi, collapse = " ")
 
 ```
 
@@ -504,16 +509,21 @@ adrese <- c("pero.peric@fer.hr", "iva.ivic@etfos.hr", "ppetrovic@gmail.com",
             "lalaic1998@gmail.co.uk", "perica.markic@fer.hr")
 
 # prebrojite i ispišite koliko u gornjem popisu ima mail adresa iz domene `fer.hr`
+sum(str_detect(adrese, "@fer.hr"))
 
 # ispišite sve adrese koje sadrže bar jednu znamenku
+adrese[str_detect(adrese, "\\d+")]
 
 # ispišite sve adrese koje na drugom mjestu imaju samoglasnik
+adrese[str_detect(adrese, "^.[aeiou]")]
 
 # ispišite sve jedinstvene domene adresa elektroničke pošte iz gornjeg niza adresa
 # (domenom smatramo dio adrese iza znaka `@`)
+str_extract(adrese, "@.*") %>% str_replace("@", "") %>% unlist %>% unique
 
 # anonomizirajte gornje adrese: niz znakova ispred znaka '@'
 # zamijenite nasumičnim šesteroznamenkastim prirodnim brojem 
+str_replace_all(adrese, ".+?(?=@)", as.character(round(runif(length(adrese),100000,999999))))
 
 ```
 
@@ -559,7 +569,10 @@ sloping down to the river."
 # - sortirajte rezultat uz pomoć funkcije sort
 # - ispišite konačni rezultat na zaslon
 
-
+temp_tekst <- tekst %>% str_replace_all("[[:punct:]]", "") %>% str_replace_all("\n", "") %>% str_split("[:space:]") %>% unlist -> rez
+rez <- rez[str_length(rez) > 2]
+rez <- rez[rez != "the" && rez != "The"]
+table(rez)
 ```
 
 
