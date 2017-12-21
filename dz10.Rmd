@@ -1,0 +1,59 @@
+---
+title: "dz10"
+author: "Goran Brlas"
+date: "12/21/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("lubridate")
+library("stringr")
+```
+
+Sljedeći zadaci odnose se na podatkovni skup pohranjen u CSV datoteci crimeSample.csv a koji predstavlja uzorak iz evidencije kriminalnih incidenata u gradu Philadelphiji (originalni podatkovni skup može se naći na ovoj poveznici). Originalni skup stupaca je reduciran a iz skupa svih obzervacija slučajnim odabirom uzorkovano je 1000 incidenata.
+
+Prije rješavanja zadataka učitajte podatke u podatkovni okvir crimes i upoznajte se s podatkovnim skupom (str, head, itd.)
+
+1. Pretvorite stupac sa vremenskom oznakom iz znakovnog tipa u POSIXct tip.
+
+```{r}
+crimes <- read.csv('crimeSample.csv',as.is=TRUE)
+
+str(crimes)
+head(crimes)
+```
+
+```{r}
+crimes$Dispatch_Date_Time <- as.POSIXct(crimes$Dispatch_Date_Time, format="%Y-%m-%d %H:%M:%S")
+head(crimes)
+```
+
+2. Podatkovnom okviru dodajte sljedeće stupce: Year, Month, Hour. Stupce popunite odgovarajućim informacijama iz vremenske oznake. Odgovorite na pitanje: u kojem mjesecu se događa najviše zločina? Koji sat u danu je prema podacima "najopasniji"?
+
+```{r}
+crimes$Year <- year(crimes$Dispatch_Date_Time)
+crimes$Month <- month(crimes$Dispatch_Date_Time)
+crimes$Hour <- hour(crimes$Dispatch_Date_Time)
+
+print("Najopasniji mjesec:")
+sort(table(month(crimes$Dispatch_Date_Time)),decreasing = T)[1]
+print("Najopasniji sat:")
+sort(table(hour(crimes$Dispatch_Date_Time)),decreasing = T)[1]
+```
+
+3. Odgovorite na pitanje: koliki je postotak incidenata gdje opis incidenta sadrži riječ burglary ili robbery? (savjet: pretvorite cijeli stupac sa opisom zločina u mala slova uz pomoć funkcije tolower()).
+
+```{r}
+paste("Burglary or robbery:", (sum(str_detect(tolower(crimes$Text_General_Code),'burglary|robbery'))*100)/ length(crimes$Text_General_Code), "%")
+```
+
+4. Ispišite na zaslon sve jedinstvene četveroznamenkaste brojeve koje možete naći u nazivima ulica u kojima je evidentiran kriminalni incident.
+
+```{r}
+numbers <- str_extract_all(crimes$Location_Block,"\\b[[:digit:]]{4}\\b")
+numbers <- unique(numbers)
+sort(unique(unlist(numbers, use.names = FALSE)))
+```
+
+

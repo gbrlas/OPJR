@@ -8,6 +8,8 @@ output:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(stringr)
+library(hflights)
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(results = 'hold')
 ```
@@ -54,11 +56,12 @@ Postoji inačica ovog podatkovnog skupa koja dolazi sa samom *R* distribucijom, 
 
 ```{r}
 #učitajte podatkovni skup iz datoteke `Titanic.csv` u varijablu `titanic`
+titanic <- read.csv("Titanic.csv", stringsAsFactors = F)
 
 #pogledajte strukturu podatkovnog okvira `titanic` uz pomoć funkcije `str`
 #i prvih nekoliko redaka uz pomoć funkcije `head`
-
-
+str(titanic)
+head(titanic)
 ```
 
 
@@ -95,9 +98,10 @@ print(df, n = 50)
 ```{r}
 #pozovite funkciju `tbl_df` nad tablicom `titanic`
 #rezultat smjestite u istu varijablu
+titanic <- tbl_df(titanic)
 
 #pozovite funkciju `glimpse` nad tablicom `titanic`
-
+glimpse(titanic)
 ```
 
 
@@ -162,16 +166,21 @@ Za poredak redaka u ispisu možemo koristiti:
 
 ```{r}
 # ispišite podatke o svim putnicima prve klase starijim od 60 godina
+filter(titanic, Age > 60 & Pclass == 1)
 
 # ispišite podatke o svim preživjelim muškim putnicima koji 
 # u imenu imaju `George` ili `Frank`
+filter(titanic, Sex == "male" & str_detect(Name, "George|Frank") & Survived)
 
 # provjerite ima li u podatkovnom skupu duplih obzervacija
+nrow(titanic) == nrow(distinct(titanic))
 
 # nasumično izaberite i ispišite podatke o pet putnika koji nisu preživjeli potonuće
 # ispis poredati silazno po cijeni karte
+filter(titanic, Survived == 0) %>% sample_n(5) %>% arrange(desc(Fare))
 
 # ispišite podatke o pet najstarijih putnica prve klase 
+arrange(titanic, desc(Age)) %>% filter(Sex == "female" & Pclass == 1) %>% top_n(5, Age)
 ```
 
 
@@ -210,18 +219,21 @@ Ovo nisu sve mogućnosti, no dodatne opcije lako je pronaći u službenoj dokume
 ```{r}
 # za nasumično odabranih 10 redaka ispišite ime putnika, dob te 
 # da li je preživio potonuće ili ne
-
+sample_n(titanic, 10) %>% select(Name, Age, Survived)
 # za prvih 10 najstarijih putnika ispišite sve atribute od imena do cijene karte
-
+arrange(titanic, desc(Age)) %>% slice(1:10) %>% select(Name:Fare)
 # za nasumično odabranih 1% redaka ispišite sve atribute osim identifikatora 
 # putnika i broja kabine
+sample_frac(titanic, 0.01) %>% select(-c(PassengerId, Cabin))
 
 # za retke od broja 10 do broja 20 ispišite sve stupce koji počinju samoglasnikom
+slice(titanic, 10:20) %>% select(matches("^[AEIOUaeiou]"))
 
 # za nasumičnih 10 putnika koji imaju nepoznat broj godina ispišite sve 
 # atribute od imena do cijene karte, 
 # potom putničku klasu te konačno da li je putnik preživio ili ne
 # poredajte ispis abecedno po imenu
+filter(titanic, is.na(Age)) %>% sample_n(10) %>% select(Name:Fare, Pclass, Survived) %>% arrange(Name)
 ```
 
 
@@ -267,11 +279,10 @@ Popis svih dostupnih funkcija može se pronaći u dokumentaciji.
 ## ZADATAK 11.5 - stvaranje novih stupaca 
 
 ```{r}
-
+titanic <- read.csv("Titanic.csv", stringsAsFactors = F)
 # tablici `titanic` dodajte logički stupac `hadRelativesOnBoard` koji će opisivati
 # da li je putnik imao rodbine na brodu
-
-
+titanic <- mutate(titanic, hadRelativesOnBoard = as.logical(SibSp + Parch))
 # za nasumičnih 10 putnica starijih od 20 godina koje su se ukrcale u Southamptonu
 # ispišite ime putnice, putničku klasu i prilagođenu cijenu karte
 # cijenu karte zamijenite odgovarajućom cijenom koliko bi ona iznosila danas
@@ -279,22 +290,24 @@ Popis svih dostupnih funkcija može se pronaći u dokumentaciji.
 # novi stupac nazovite `FareToday` a 
 # iznos zaokružite na dvije decimale i dodajte prefiks `$`
 # ispis poredajte po putničkoj klasi silazno
-
+filter(titanic, Age > 20 & Sex == "female" & Embarked == "S") %>% sample_n(10) %>% transmute(Name, Pclass, FareToday = sprintf("$%f", round(Fare * 23.85, 2))) %>% arrange(desc(Pclass))
 
 # stvorite stupac FareCategory kojim ćete podijeliti cijene karata 
 # u pet kategorija jednake veličine
 # potom nasumično izaberite 20 putnika i ispišite 
 # ime putnika, putničku klasu, cijenu karte i kategoriju
 # ispis poredajte po kategoriji cijene
-
+titanic <- mutate(titanic, FareCategory = ntile(Fare, 5)) 
+titanic %>% sample_n(20) %>% select(Name, Pclass, Fare, FareCategory) %>% arrange(FareCategory)
 
 # tablici `titanic` dodajte stupac `EmbarkationPort` u kojem će pisati puno 
 # ime luke ukrcaja (Southampton, Queenstown ili Cherbourg)
 # koristite `mutate` i dva `ifelse`
+titanic <- mutate(titanic, EmbarkationPort = ifelse(Embarked == "S", "Southampton", ifelse(Embarked == "Q", "Queenstown", "Cherbourg")))
 
 
 # ispišite prvih 10 redaka tablice `titanic`
-
+slice(titanic, 1:10)
 ```
 
 
@@ -310,12 +323,17 @@ Učitajmo paket `dplyr` i podatkovni okvir `hflights` koji se nalazi u paketu is
 # učitajte paket `hflights`
 # ukoliko je potrebno instalirajte ga sa CRAN repozitorija
 # uz pomoć funkcije `data` učitajte okvir u globalnu okolinu
+data("hflights")
+
+hflights <- hflights
 
 # pretvorite okvir u `hflights` u klasu `tbl`
-
+hflights <- tbl_df(hflights)
 # upoznajte se s podatkovnim skupom `hflights`
 # pored funkcija glimpse/head/itd. možete pogledati i dokumentaciju
 # skupa uz pomoć naredbe `?hflights`
+head(hflights)
+glimpse(hflights)
 ```
 
 
@@ -335,14 +353,19 @@ group_by(podaci, a, b, c)
 ```{r}
 # stvorite varijablu `flight815` koja će sadržavati 
 # retke iz tablice `hflights`vezane uz let broj 815
-
+flights815 <- filter(hflights, FlightNum == 815)
+flights815
 # stvorite varijablu `grouped815` koja će sadržavati 
 # retke iz `flight815` grupirane po mjesecu
-
+grouped815 <- group_by(flights815, Month)
+grouped815
 # provjerite klasu varijabli `flight815` i `grouped815`
-
+class(flights815)
+class(grouped815)
 # uz pomoć funkcije `glimpse` pogledajte strukture 
 # varijabli `flight815` i `grouped815`
+head(flights815, 5)
+head(grouped815, 5)
 ```
 
 
@@ -368,6 +391,8 @@ Za agregacijsku funkciju u pravilu možemo koristiti bilo koju funkciju koja vek
 ```{r}
 # izračunajte prosječno kašnjenje u dolasku leta za varijable `flight815` i `grouped815`
 # koristite funkciju `summarise`
+summarise(flights815, mean(ArrDelay))
+summarise(grouped815, mean(ArrDelay))
 ```
 
 
@@ -388,13 +413,14 @@ filter(podaci, a > 5) %>%  group_by(a,b) %>%  summarise(mean(c)) %>% arrange(des
 # lošeg vremena u svakom mjesecu
 # tablica rezultata mora imati stupce 
 # `Month` i `BadWeatherCancellations`
+filter(hflights, CancellationCode == "B") %>% group_by(Month) %>% summarise("BadWeatherCancellations" = sum(Cancelled))
 
 # ispišite prosječno vrijeme kašnjenja u dolasku 
 # (ignorirajte retke sa NA) za zrakoplovne luke 
 # LAX, JFK i LGA u različitim danima u tjednu
 # novi stupac nazovite 'MeanArrDelay'
 # ispis poredajte po vremenu kašnjenja silazno
-
+filter(hflights, Dest == "LAX" | Dest == "JFK" | Dest == "LGA") %>% group_by(Dest, DayOfWeek) %>% summarise("MeanArrDelay" = mean(ArrDelay, na.rm = T)) %>% arrange(desc(MeanArrDelay))
 
 ```
 

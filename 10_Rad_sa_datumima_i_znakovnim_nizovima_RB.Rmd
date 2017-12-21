@@ -40,9 +40,14 @@ Funkcija `as.Date()` po *default*-u prihvaća datume oblika `%Y-%m-%d`, gdje `%Y
 
 ```{r}
 # ispišite današnji datum
-
+Sys.Date()
 # pretvorite sljedeće znakovne nizove u objekt tipa `Date` i ispišite rezultat na zaslon:
 # '1986-12-27','2016-31-05', '17. 10. 2015.', '01#01#2001'
+as.Date('1986-12-27')
+as.Date('2016-31-05', "%Y-%d-%m")
+as.Date('17. 10. 2015.', "%d. %m. %Y.")
+as.Date('01#01#2001', "%d#%m#%Y")
+
 ```
 
 
@@ -56,10 +61,12 @@ Sa datumima možemo raditi jednostavne računske operacije kao što je dodavanje
 
 ```{r}
 # ispišite koji je datum bio 1000 dana prije današnjeg datuma
-
+Sys.Date() - 1000
 # dodajte jedan dan datumima 28.2.2015. i 28.2.2016 i ispišite rezultat
-
+as.Date("28.2.2015.", "%d.%m.%Y.") + 1
+as.Date("28.2.2016.", "%d.%m.%Y.") + 1
 # ispišite koliko je dana prošlo od 1.1.2000. do danas
+Sys.Date() - as.Date("1.1.2000.", "%d.%m.%Y.")
 ```
 
 
@@ -79,9 +86,9 @@ Zadnji izraz će zapravo rezultirati objektom klase `difftime` koja označava vr
 # koristite funkciju `difftime`
 # NAPOMENA: ne morate eksplicitno pozvati funkciju `as.Date`, funkcija `difftime`
 #       će to sama učiniti ako pošaljete datum u default-nom obliku
-
+difftime(time1 = "2016-03-01", "2015-03-01", units = "weeks")
 # koliko je prošlo sati od 1.3.2015. do danas?
-
+difftime(time1 = Sys.Date(), "2015-03-01", units = "hours")
 ```
 
 
@@ -115,7 +122,7 @@ Isprobajmo ovu funkciju.
 
 ```{r}
 # ispišite sekvencu datuma od 1.1.2010. do 1.1.2030. u koracima od 6 mjeseci
-
+seq(as.Date("2010-01-01"), as.Date("2030-01-01"), by = "6 months")
 
 # napravite raspored čišćenja zajedničkih prostora za stambenu zgradu
 # prostori se moraju čistiti svaka 3 tjedna
@@ -125,13 +132,13 @@ Isprobajmo ovu funkciju.
 stanovi <- data.frame(broj_stana = 1:10,
                       prezime = c("Ebert", "Ladovac", "Cerić", "Dikla", "Anić",
                                   "Perić", "Žužić", "Babić", "Ibiz", "Radler"))
-
+stanovi
 # dodajte stupac `ciscenje` sa po jednim datumom za svaki pojedini stan 
 # redom po brojevima stana, počevši od današnjeg datuma
-
+seq(Sys.Date(), by = "3 weeks", along.with = stanovi$broj_stana) %>% as.character() -> stanovi$ciscenje
 
 # ispisite podatkovni okvir `stanovi` (koristite `print` ili pretvorite datume u znakovni stupac)
-
+stanovi
 ```
 
 
@@ -153,11 +160,13 @@ Funkcija `as.POSIXct()` kao parametar očekuje vremensku oznaku tipa `%Y-%m-%d %
 
 ```{r}
 # ispišite trenutni datum i  vrijeme
+Sys.time()
 
 # pretvorite sljedeće znakovne nizove u vremenske oznake i ispišite ih na zaslon:
 # "2015-10-28 15:30:42"
 # "01-12-2001 14:30"   <-- oznaka očitana u New York-u, SAD, vremenska zona EST
-
+as.POSIXct(x = "2015-10-28 15:30:42")
+as.POSIXct("01-12-2001 14:30", tz = "EST", format = "%d-%m-%Y %H:%M")
 ```
 
 
@@ -171,8 +180,9 @@ Imena vremenskih zona su standardizirana (tzv. "Olsonove vremenske zone") a dohv
 
 ```{r}
 # ispišite trenutnu vremensku zonu
-
+Sys.timezone()
 # ispišite 10 nasumično odabranih oznaka vremenskih zona instaliranih na trenutnoj platformi
+sample(OlsonNames(), 10)
 ```
 
 ***
@@ -185,8 +195,9 @@ Vremenske oznake također mogu koristiti operatore `+` i `-` uz cjelobrojne vrij
 
 ```{r}
 # ispišite koje će biti vrijeme 1000 sekundi od ovog trenutka
-
+Sys.time() + 1000
 # ispišite koliko je prošlo sati od ponoći 1.1.2015. do sad
+difftime(Sys.time(), "2015-01-01 00:00:00", units = "hours")
 ```
 
 
@@ -203,13 +214,15 @@ Klasa `POSIXlt` se ponaša isto kao i `POSIXct` (za stvaranje se koristimo funkc
 # pretvorite sljedeći znakovni niz u vremensku oznaku tipa `POSIXlt`
 # pohranite rezultat u varijablu `t_long`
 # "1.5.2013 13:35"
-
+t_long <- as.POSIXlt("1.5.2013 13:35", format = "%d.%m.%Y %H:%M")
+t_long
 # ispišite broj sati i broj minuta vremenske oznake `t_long`
 # ispisom njenih atributa naziva `hour` i `min`
-
+t_long$hour
+t_long$min
 # pretvorite varijablu `t_long` u znakovni vektor i ispišite rezultat
 # obavite sve u jednoj naredbi uz pomoć operatora %>% 
-
+t_long %>% unlist()
 ```
 
 
@@ -229,7 +242,7 @@ Jedna od stvari koja je možda najkorisnija programerima koji ne vole pisati obl
 ## ZADATAK 10.9 - funkcije paketa `lubridate` za parsiranje datuma`
 
 ```{r}
-# library(lubridate)   #učitati ako je potrebno!
+library(lubridate)
 
 # koristeći se funkcijama iz paketa `lubridate`
 # parsirajte  u datume i ispišite sljedeće znakovne nizove
@@ -237,7 +250,10 @@ Jedna od stvari koja je možda najkorisnija programerima koji ne vole pisati obl
 #  "28.2.1983."
 #  "07#31#1996"
 #  "20010830"
-
+ymd("2016-07-31")
+dmy("28.2.1983.")
+mdy("07#31#1996")
+ymd("20010830")
 ```
 
 
@@ -255,7 +271,8 @@ Navedeni koncept može se koristiti i za vremenske oznake, samo imenu funkcije d
 # parsirajte u vremenske oznake i ispišite sljedeće znakovne nizove
 # "17.5.1977. 10:15pm"
 # "20160429 10.05.17"
-
+dmy_hm("17.5.1977. 10:15pm")
+ymd_hms("20160429 10.05.17")
 ```
 
 
@@ -273,10 +290,13 @@ Paket lubridate također uvelike olakšava izvlačenje segmenata datuma i vremen
 x <- dmy_hms("19.7.1996. 16:15:27")
 
 # iz gornje vremenske oznake izvucite i ispišite sate i minute
-
+hour(x)
+minute(x)
 # postavite godinu gornje vremenske oznake na 2011., a mjesec na lipanj
-
+year(x) <- 2011
+month(x) <- 6
 # ispišite `x`
+x
 ```
 
 
@@ -294,8 +314,9 @@ Za trenutni datum i vrijeme lubridate nudi alternative funkcijama `Sys.Date()` i
 
 ```{r}
 # ispišite sutrašnji datum
-
+today() + 1
 # ispišite koliko je bilo sati, minuta i sekundi prije točno sat vremena
+now() - 60*60
 
 ```
 
@@ -320,10 +341,12 @@ Trenutke smo već upoznali, to su vremenske oznake koje smo do sada stvarali. Za
 
 ```{r}
 # ispišite trajanje i period od 3 tjedna
-
+weeks(3)
+dweeks(3)
 # u varijablu `v` upišite period od 5 godina, 3 mjeseca i 2 dana
-
+v <- years(5) + months(3) + days(2)
 # dodajte gornji period današnjem datumu
+today() + v
 ```
 
 
@@ -341,15 +364,17 @@ Konačno, interval stvaramo uz pomoć funkcije interval kojoj dajemo početni i 
 ```{r}
 # stvorite varijablu `interval1` koja će pohraniti interval od 6 mjeseci prije današnjeg dana
 # do 6 mjeseci iza današnjeg dana
-
+interval1 <- interval(today() - months(3), today() + months(3))
 # stvorite varijablu `interval2` koja će pohraniti interval od današnjeg dana
 # do datuma koji će se dogoditi za 6 mjeseci, 3 tjedna i 2 dana
-
+interval2 <- as.interval(months(4) + weeks(3) + days(2), today())
 # stvorite varijablu `interval3` koja će pohraniti interval 
 # od 1.5.2002. do 1.7.2002.
-
+interval3 <- interval(dmy("1.5.2002."), dmy("1.7.2002."))
 # ispišite sva tri intervala
-
+interval1
+interval2
+interval3
 ```
 
 
@@ -371,10 +396,12 @@ Kod intervala je zgodno što između ostalog možemo:
 
 ```{r}
 # provjerite da li je današnji dan unutar intervala definiranog varijablom `interval1`
-
+today() %within% interval1
 # ukoliko se `interval1` i `interval2` preklapaju
 # ispišite njihov presjek
-
+if (int_overlaps(interval1, interval2)) {
+  intersect(interval1, interval2)
+}
 ```
 
 
@@ -569,10 +596,12 @@ sloping down to the river."
 # - sortirajte rezultat uz pomoć funkcije sort
 # - ispišite konačni rezultat na zaslon
 
-temp_tekst <- tekst %>% str_replace_all("[[:punct:]]", "") %>% str_replace_all("\n", "") %>% str_split("[:space:]") %>% unlist -> rez
-rez <- rez[str_length(rez) > 2]
-rez <- rez[rez != "the" && rez != "The"]
-table(rez)
+str_replace_all(tekst, '[:punct:]', '') %>% str_split('[:space:]') %>% unlist() -> rez
+rez <- rez[str_length(rez) > 2] 
+rez <- rez[rez != 'The' & rez != 'the']
+rez <- table(rez) 
+rez <- rez[rez > 1]
+sort(rez, decreasing = T)
 ```
 
 
