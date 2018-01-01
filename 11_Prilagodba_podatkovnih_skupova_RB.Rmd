@@ -441,11 +441,15 @@ mostFreqValue <- function(x) table(x) %>% sort(decreasing = T) %>% names %>% `[`
 # minimalno i maksimalno vrijeme kašnjenja u dolasku 
 # te koja zrakoplovna luka se najčešće 
 # pojavljuje u toj kategoriji
-
+mutate(hflights, ArrDelayCatId = ntile(ArrDelay,10)) %>%
+group_by(ArrDelayCatId) %>%
+summarise(TotalFlights = n(), minArrDelay = min(ArrDelay), maxArrDelay = max(ArrDelay), mostFreqDest = mostFreqValue(Dest))
 
 # ponovite prethodni primjer ali umjesto funkcije 
 # `ntile` isprobajte funkciju `cut`
-
+mutate(hflights, ArrDelayCatId = cut(ArrDelay,10)) %>%
+group_by(ArrDelayCatId) %>%
+summarise(TotalFlights = n(), minArrDelay = min(ArrDelay), maxArrDelay = max(ArrDelay), mostFreqDest = mostFreqValue(Dest))
 ```
 
 
@@ -488,9 +492,10 @@ gdje su `df1` i `df2` podatkovni okviri koje spajamo, a nizovi znakova *"s1"* i 
 ```{r}
 # stvorite okvir `korisnikMjesto` koji će biti rezultat
 # prirodnog spajanja okvira `korisnik` i `mjesto`
-
+korisnikMjesto <- inner_join(korisnik,mjesto,by=c("pbrBoravista" = "pbr"))
 
 # ispišite okvir `korisnikMjesto`
+korisnikMjesto
 ```
 
 
@@ -506,10 +511,10 @@ U ovisnosti o tome koje obzervacije želimo zadržati gledano okvire koje spajam
 # stvorite okvir `korisnikMjesto2` koji će biti rezultat
 # prirodnog spajanja okvira `korisnik` i `mjesto`
 # ali će zadržati sve retke iz tablice 'mjesto`
-
+korisnikMjesto2 <- right_join(korisnik,mjesto,by=c("pbrBoravista" = "pbr"))
 # ispišite okvir `korisnikMjesto2`
 # retke poredajte po identifikatoru korisnika
-
+head(korisnikMjesto2)
 ```
 
 
