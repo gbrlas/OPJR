@@ -1,0 +1,57 @@
+---
+title: "dz11"
+author: "Goran Brlas"
+date: "1/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(magrittr)
+library(dplyr)
+```
+
+U zadacima za vježbu poslužiti ćemo se proširenom podatkovnim skupom mammals sleep dostupnim u vizualizacijskom paketu ggplot2. Učitajte paket ggplot2 te potom prenesite podatkovni okvir msleep u globalnu okolinu uz pomoć funkcije data.
+
+Prije rješavanja učitajte podatkovni skup i upoznajte se s njim uz pomoć uobičajenih funkcija.
+```{r}
+data("msleep")
+
+head(msleep)
+summary(msleep)
+```
+
+1. Za 10 biljojeda koji najdulje spavaju ispišite ime, koliko dnevno spavaju i prosječnu tjelesnu, težinu u kg. Ispis poredajte po duljini spavanja silazno.
+```{r}
+arrange(msleep, desc(sleep_total)) %>% head(10) %>% select(name, sleep_total, bodywt)
+```
+
+2. Ispišite prosječno, najdulje i najkraće vrijeme spavanja životinja ovisno o njihovom tipu prehrane.
+```{r}
+group_by(na.omit(msleep), vore) %>% summarise(avg_sleep = mean(sleep_total), max_sleep = max(sleep_total), min_sleep = min(sleep_total))  %>% ungroup()
+```
+
+3. Podijelite ukupno vrijeme spavanja u 5 razreda jednoliko po ukupnoj duljini dnevnog spavanja. Za svaki razred ispišite ukupan broj životinja koje pripadaju razredu, a potom posebno ukupan broj pripadnika razreda koji nisu biljojedi. Ispis poredajte od razreda životinja koje najmanje spavaju naviše. Stupce nazovite smisleno i pripazite da konačna tablica nema NA vrijednosti.
+```{r}
+msleep2 <- mutate(msleep, razred = ntile(sleep_total, 5))
+msleep2 %>% group_by(razred) %>% summarise(ukupno = n()) -> msleep2a
+msleep2 %>% filter(vore != "herbi") %>% group_by(razred) %>% summarise(nije_biljojed = n()) -> msleep2b
+inner_join(msleep2a, msleep2b, "razred") %>% arrange(desc(razred))
+```
+
+Sljedeći okvir sadrži šifre statusa očuvanja životinja i njihove opise:
+```{r}
+conservationStatus <- data.frame( 
+  code = c("ex", "ew", "cr", "en", "vu", "nt", "cd", "lc"),
+  description = c("extinct", "extinct in the wild", 
+                 "critically endangered", "endangered",
+                 "vulnerable", "near threatened", 
+                 "conservation dependent", "least concern"))
+```
+
+4. Dodajte okviru msleep stupac conservationDesc koji će sadržavati pripadajuće opise preuzete iz gornjeg okvira. Pripazite da kod proširenja ne izgubite nijedan redak iz okvira msleep.
+```{r}
+left_join(msleep,conservationStatus, by=c("conservation"="code"))
+```
+
