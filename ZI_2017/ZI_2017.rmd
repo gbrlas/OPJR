@@ -1,0 +1,230 @@
+---
+output:
+  html_document: default
+---
+
+```{r setup, include = F}
+library(MASS)
+library(tidyverse)
+library(openintro)
+library(stringr)
+library(dplyr)
+library(ggplot2)
+library(MASS)
+knitr::opts_chunk$set(results = 'hold')
+```
+
+******************
+
+## OSNOVE PROGRAMSKOG JEZIKA R
+#### **Fakultet elektrotehnike i računarstva, Sveučilište u Zagrebu**
+#### 9/2/2018
+
+******************
+
+# **ZAVRŠNI ISPIT 2017/2018**  
+
+======================================================================================
+
+#### JMBAG:         0036476746
+#### Ime i prezime: Goran Brlas
+#### e-mail:        goran.brlas@fer.hr
+#### IP adresa:     161.53.78.34
+
+
+======================================================================================
+
+#### OSNOVNE UPUTE
+
+U nastavku slijedi niz zadataka za završni ispit. Rješenja zadatka mogu uključivati **upisivanje programskog koda** ili **čistog teksta** te **izvršavanje programskog koda**. Molimo da se pridržavate sljedećih naputaka:
+
+- prije rješavanja stisnite gumb **Knit to HTML** kako bi provjerili ispravnost sučelja te dobili predložak ispita u preglednijem obliku u prozoru preglednika s desne strane
+- ukoliko nije drugačije navedeno, prostor za rješavanje zadataka sami stvarate kombinacijom tipaka **CTRL+ALT+I** ili odabirom opcija **Insert -> R**
+- pažljivo čitajte tekstove zadataka
+- tekst zadatka može sadržavati i programski kod kojeg morate izmijeniti i nadopuniti te izvršiti već prema uputama danim u tekstu zadatka i / ili komentarima postojećeg programskog koda
+- ukoliko je rješenje zadatka programski kod koji nešto ispisuje, budite sigurni da bilježnica uključuje i taj ispis
+- programski kod slobodno komentirajte
+
+
+Nakon ispunjavanja bilježnice odaberite opciju **Knit to HTML* i pohranite rezultat u HTML obliku u predviđeni repozitorij na *Moodle* stranicama predmeta. 
+
+Tijekom rješavanja bilježnice smijete se koristiti pomoćnim sredstvima kao što su podsjetnici, dokumentacija jezika R, bilježnice s predavanja, *Google* tražilica. **Ne smijete razmjenjivati informacije sa drugim polaznicima ispita bilo kojim vidom komunikacije, uključujući i elektroničku poštu, društvene mreže, chat programe ili korištenje zajedničkog dijeljenog repozitorija!**
+
+Pohranom HTML bilježnice pod Vašim korisničkim imenom i lozinkom garantirate da tijekom ove provjere znanje niste od drugoga primili niti pružili pomoć te da se niste koristili nedopuštenim sredstvima. Ove su radnje povreda Kodeksa ponašanja te mogu uzrokovati trajno isključenje s Fakulteta.
+
+
+```{r, echo = F, warnings = F}
+rm(list = ls())    # brišemo postojeće varijable 
+set.seed(1234)
+```
+
+Učitane podatke možete vidjeti u prozoru s gornje desne strane sučelja **RStudio**, tab *Environment**.
+
+======================================================================================
+
+## ZADACI
+
+******************
+
+1. (2 boda) Uz pomoć jedne naredbe učinite sljedeće: odaberite 30 nasumičnih **cijelih** brojeva iz intervala [10, 20], oblikujte ih u matricu 5 x 6 (popunjavanje po retcima) te ispišite najveći element svakog stupca. Rješenje napišite ispod znaka `#`.
+
+
+**RJEŠENJE:**
+
+```{r}
+set.seed(1234)
+#
+
+m <- matrix(ceiling(runif(30, 10, 20)), nrow = 5, ncol = 6, byrow = T)
+m
+print("=============================")
+apply(m, 2, max) 
+```
+
+          
+******************
+
+2. (4 boda) U datoteci `untidyIris.csv` nalazi se "neuredni" uzorak od 12 cvjetova iz podatkovnog okvira `iris` (dostupnog u R okruženju). 
+
+a) Učitajte podatke u podatkovni okvir `untidyIris` i objasnite zašto podatkovni okvir `untidyIris` predstavlja neuredne podatke. 
+
+```{r}
+# prostor za programski kod
+untidyIris <- read.csv("untidyIris.csv", header = T, stringsAsFactors = F)
+head(untidyIris)
+```
+
+ODGOVOR:
+Ovaj dataframe predstavlja neuredne podatke zato što se stupci FeatureName i FeatureValue ne odnose na istu stvar, odnosno za vrijednost od npr. 5.8 za neki zapis to može prestavljati "Sepal.Length", dok za drugi zapis to može biti "Petal.Width".
+
+b) Napišite programski blok koji će urediti `untidyIris` (možete proučiti originalni podatkovni okvir `iris` za referencu). Ispišite konačni oblik okvira `untidyIris`.
+
+
+**RJEŠENJE:**
+
+```{r}
+untidyIris2 <- spread(untidyIris, FeatureName, FeatureValue)
+head(untidyIris2)
+```
+
+
+********************
+
+Zadaci 3. - 5. odnose se na podatkovni okvir `marioKart` iz paketa `openintro` koja sadržava cijene koje je postigla igra Mario Kart na aukcijskom portalu Ebay 2009. godine. Instalirajte navedeni paket i postavite podatkovni okvir u globalnu okolinu. proučite podatkovni okvir prije nastavljanja sa zadacima.
+
+
+```{r}
+# install.packages("openintro")   # ako je potrebno
+#library(openintro)  # ako je potrebno
+data(marioKart)
+
+# head, glimpse, summary...
+head(marioKart)
+glimpse(marioKart)
+```
+
+
+*********************************
+
+
+3. (6 bodova) Napišite naredbe koje će izvršiti sljedeće:
+
+a) Za sve nove primjerke igre čiji opis sadrži riječi "brand new", a koje je prodavao korisnik sa ratingom manjim od 1000 ispišite trajanje aukcije, broj ponuda, cijenu u dolarima i cijenu u kunama (ako prepostavimo da vrijedi $1 = 6 Kn). 
+
+**RJEŠENJE:**
+
+```{r}
+marioKart %>% filter(str_detect(tolower(marioKart$title), "brand new")) %>% filter(sellerRate < 1000) %>% select(duration, nBids, totalPr) -> tempdf
+mutate(tempdf, totalPrKn = totalPr * 6)
+```
+
+
+b) Za sve kombinacije trajanja aukcije i stanja igre napišite prosječnu i maksimalnu postignutu cijenu. Pripazite da cijene budu zaokružene na dvije decimale. Ispis poredajte po trajanju aukcije uzlazno.
+
+**RJEŠENJE:**
+
+```{r}
+marioKart %>% group_by(duration, cond) %>% summarise("meanPrice" = round(mean(totalPr, na.rm = T), 2), maxPrice = round(max(totalPr, na.rm = T), 2)) %>% arrange(duration)
+```
+
+***********************************
+
+
+4. (6 bodova) Napišite naredbe koje će izvesti sljedeće:
+
+a) Nacrtati točkasti graf odnosa rating-a prodavatelja sa postignutom cijenom. Točke na grafu se moraju razlikovati ovisno o stanju igre. Graf mora imati i naznačen linearni trend (zajednički za oba stanja igre). Graf ne smije uključivati obzervacije kod kojih je rating prodavatelja iznad 1000 a cijena iznad 100 dolara.
+
+**RJEŠENJE:**
+
+```{r}
+ggplot(filter(marioKart, sellerRate <= 1000 & totalPr <= 100), aes(x = sellerRate, y = totalPr)) + geom_point(aes(color = cond, shape = cond)) + stat_smooth(method=lm)
+```
+
+
+b)  Nacrtati histograme ukupno postignute cijene igre u ovisnosti o stanju igre (dva histograma, jedan iznad drugog). Cijena mora biti podijeljena u pet ladica. Stupići histograma moraju svojom bojom naznačavati informaciju o načinu slanja pošiljke a stupići različitih boja moraju biti posloženi jedan pokraj drugog. 
+
+**RJEŠENJE:**
+
+```{r, warning=FALSE}
+ggplot(filter(marioKart, cond == "new"), aes(fill = shipSp)) + 
+  geom_histogram(aes(x=totalPr, weights=totalPr), bins = 5, position="dodge") +
+  ylab("Total price")
+ggplot(filter(marioKart, cond == "used"), aes(fill = shipSp)) + 
+  geom_histogram(aes(x=totalPr, weights=totalPr), bins = 5, position="dodge") +
+  ylab("Total price")
+
+ggplot(marioKart, aes(fill = shipSp)) + 
+  geom_histogram(aes(x=totalPr, weights=totalPr), bins = 5, position="dodge") +
+  ylab("Total price") + facet_wrap(facets = ~ cond, nrow = 2)
+
+```
+
+
+
+**********************************
+
+5.  (4 boda) Istrenirajte model linearne regresije ovisnosti ukupne cijene o stanju igre. Proučite dobiveni linearni model i odgovorite na pitanja: 
+
+a) kako se mijenja cijena s obzirom na različito stanje igre? 
+
+b) smatrate li da je stanje igre bitan čimbenik u konačnoj cijeni? Obrazložite.
+
+**RJEŠENJE:**
+
+```{r}
+linMod <- lm(totalPr ~ cond, marioKart)
+linMod
+
+summary(linMod)
+```
+ 
+ ODGOVOR:
+ 
+ a) S promjenom stanja igre cijena pada za cca 6.6 dolara.
+ 
+ b) Smatram da stanje igre nije toliko bitan čimbenik zato što promjena stanja utječe na promjenu igre samo cca 12%, što nije statistički toliko značajno budući da imamo samo 2 moguća stanja. Također, ovu tvrdnju potvrđuje sljedeći zadatak u kojem postepeno gradimo modele i gdje u konačnici možemo vidjeti da stanje igre nije jedna od varijabli koje se koriste za predikciju.
+ 
+***********************
+ 
+6. (3 boda) Postupno izgradite model linearne regresije za određivanje konačne cijene igre metodom "unatrag od punog modela" i "unaprijed od praznog modela". Iz podatkovnog okvira prethodno izbacite stupce `"ID"` i `"title"`. Ispišite sažetak dobivenih modela. Proučite modele i odgovorite: koja dva atributa smatrate ključnima u formiranju konačne cijene?
+ 
+**RJEŠENJE:**
+ 
+```{r}
+lm_sve <- lm(totalPr ~ ., data = select(marioKart, -ID, -title))   
+lm_prazan <- lm(totalPr ~ 1, data = select(marioKart, -ID, -title))
+
+lm1 <- stepAIC(lm_sve, direction = "backward")
+summary(lm1)
+print("====================================")
+print("====================================")
+print("====================================")
+lm2 <- stepAIC(lm_prazan, direction = "forward", scope = list(upper = lm_sve, lower = lm_prazan))
+summary(lm2)
+```
+ 
+Odgovor: Ključni atributi za formiranje cijene su cijena shippinga te broj Wii volana.
+
+************************
+
+

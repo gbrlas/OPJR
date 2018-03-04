@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document: default
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(gridExtra)
+library(GGally)
+library(ggplot2)
+knitr::opts_chunk$set(results = 'hold')
+```
+1. Učitavanje podataka i brisanje čudnih simbola
+
+```{r}
+movies <- read.csv("IMDB_movie_dataset.csv", encoding = "UTF-8", stringsAsFactors = F)
+movies$movie_title <- gsub("\u00A0", "", movies$movie_title)
+head(movies)
+str(movies)
+```
+
+Postavljanje nepoznatih godina na vrijednost "unknown" radi lakšeg prikaza na grafovima.
+```{r}
+movies$title_year[is.na(movies$title_year)] <- "unknown"
+movies$title_year <- as.factor(movies$title_year)
+
+movies$language[movies$language == ""] <- "unknown"
+movies$language <- as.factor(movies$language)
+```
+
+2. Vizualizacija podataka
+
+
+Broj filmova po godinama
+```{r, fig.width = 10}
+ggplot(movies, aes(x = title_year, fill = title_year)) + geom_bar() + theme(axis.text.x = element_text(angle = 60)) + theme(axis.text.x = element_text(angle = 60), plot.title = element_text(hjust = 0.5)) + labs(x = "Year", y = "Number of movies", color = "Year", title = "Number of movies per year")
+```
+
+Ukupna zarada po godinama
+```{r, fig.width = 10}
+ggplot(movies, aes(x = title_year, y = gross, fill = title_year)) + geom_bar(stat = "sum") + theme(axis.text.x = element_text(angle = 60), plot.title = element_text(hjust = 0.5)) + labs(x = "Year", y = "Total gross", color = "Year", title = "Total gross per year")
+```
+
+Broj filmova u jezicima koji nisu engleski
+```{r, fig.width = 10}
+ggplot(movies[which(movies$language != "English"), ], aes(x = language, fill = language)) + geom_bar() + theme(axis.text.x = element_text(angle = 60)) + theme(axis.text.x = element_text(angle = 60), plot.title = element_text(hjust = 0.5)) + labs(x = "Language", y = "Number of movies", color = "Year", title = "Movies by language not in English")
+```
+
+Raspodjela ocjena na IMDBu.
+```{r, fig.width=6}
+ggplot(movies, aes(x = imdb_score, fill = cut(imdb_score, 100))) + geom_histogram(bins = 10, show.legend = FALSE) + theme(axis.text.x = element_text(angle = 60), plot.title = element_text(hjust = 0.5)) + labs(x = "Year", y = "IMDB score", title = "IMDB score count")
+```
+
+Spajanje svih glumaca koji su u datasetu u jedan dataframe, sortiran po broju njihovim pojavljivanja u filmovima.
+```{r}
+actors <- c(movies$actor_1_name, movies$actor_2_name, movies$actor_3_name)
+actors <- actors[nchar(actors) > 1]
+actors <- factor(actors)
+
+actors <- reorder(actors,actors,FUN=length)
+actors2 <- data.frame(sort(table(actors), decreasing = T)[1:20])
+```
+
+Prikaz top20 glumaca koji su glumili u najviše filmova.
+```{r, fig.width=6}
+
+
+
+ggplot(actors2, aes(x = reorder(actors2$actors, actors2$Freq), y = Freq, fill = cut(Freq, 100))) + theme(axis.text.x = element_text(angle = 60)) + geom_bar(stat = "identity", show.legend = F) + theme(axis.text.x = element_text(angle = 60), plot.title = element_text(hjust = 0.5)) + labs(x = "Actor", y = "Number of movies", title = "Acted in most movies")
+
+```
+
